@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eFootball Exposure Caption Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0a0f;
+    color: #e8e8f0;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .header {
+    text-align: center;
+    padding: 28px 0 20px;
+    border-bottom: 1px solid #1e1e2e;
+    margin-bottom: 28px;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.6rem;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #ff3c3c, #ff8c00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header p {
+    color: #666680;
+    font-size: 0.82rem;
+    margin-top: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 2rem; }
+  }
+
+  .panel {
+    background: #13131f;
+    border: 1px solid #1e1e30;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .panel.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .panel h2 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ff5533;
+    margin-bottom: 14px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    color: #888898;
+    margin-bottom: 5px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: #0d0d1a;
+    border: 1px solid #252535;
+    border-radius: 8px;
+    color: #e8e8f0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    padding: 9px 12px;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus, textarea:focus, select:focus {
+    border-color: #ff5533;
+  }
+
+  textarea { resize: vertical; min-height: 70px; }
+
+  select option { background: #0d0d1a; }
+
+  .preset-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 14px;
+  }
+
+  .preset-btn {
+    background: #1a1a2e;
+    border: 1px solid #2a2a45;
+    border-radius: 20px;
+    color: #aaaacc;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 5px 12px;
+    transition: all 0.18s;
+  }
+
+  .preset-btn:hover, .preset-btn.active {
+    background: #ff3c2220;
+    border-color: #ff5533;
+    color: #ff7755;
+  }
+
+  .tag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .tag {
+    background: #1a1a2e;
+    border: 1px solid #2a2a45;
+    border-radius: 6px;
+    color: #8888bb;
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 4px 9px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .tag:hover { border-color: #ff5533; color: #ff7755; }
+  .tag.selected { background: #ff332215; border-color: #ff5533; color: #ff7755; }
+
+  .generate-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #cc2200, #ff6600);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    padding: 14px;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 4px;
+  }
+
+  .generate-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .generate-btn:active { transform: translateY(0); }
+
+  .output-box {
+    background: #0d0d1a;
+    border: 1px solid #252535;
+    border-radius: 10px;
+    color: #d8d8f0;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    min-height: 120px;
+    padding: 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+  }
+
+  .output-placeholder {
+    color: #44445a;
+    font-style: italic;
+  }
+
+  .copy-btn {
+    background: #1e1e30;
+    border: 1px solid #2e2e48;
+    border-radius: 7px;
+    color: #aaaacc;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    margin-top: 10px;
+    transition: all 0.18s;
+  }
+
+  .copy-btn:hover { border-color: #ff5533; color: #ff7755; }
+  .copy-btn.copied { background: #22441a; border-color: #44bb44; color: #88ee88; }
+
+  .char-count {
+    color: #555568;
+    font-size: 0.7rem;
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  .loading {
+    color: #ff7755;
+    font-style: italic;
+    font-size: 0.85rem;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #1e1e2e;
+    margin: 14px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚠️ eFootball Exposer ⚠️</h1>
+  <p>Caption Preset Generator · Reel Accounts</p>
+</div>
+
+<div class="grid">
+
+  <!-- LEFT: Inputs -->
+  <div class="panel">
+    <h2>🎯 Reel Details</h2>
+
+    <label>Account/Username Being Exposed</label>
+    <input type="text" id="username" placeholder="e.g. @scammer_ef2024">
+
+    <label>Type of Offense</label>
+    <div class="preset-buttons" id="offensePresets">
+      <button class="preset-btn" data-val="scam account / fake giveaway">Fake Giveaway</button>
+      <button class="preset-btn" data-val="hacker / cheater">Hacker/Cheater</button>
+      <button class="preset-btn" data-val="toxic & abusive player">Toxic Player</button>
+      <button class="preset-btn" data-val="coin seller / account seller">Coin Seller</button>
+      <button class="preset-btn" data-val="impersonator">Impersonator</button>
+      <button class="preset-btn" data-val="rage quitter">Rage Quitter</button>
+    </div>
+    <input type="text" id="offense" placeholder="Or type a custom offense...">
+
+    <label>Caption Tone</label>
+    <div class="preset-buttons" id="tonePresets">
+      <button class="preset-btn active" data-val="aggressive warning">🔥 Aggressive</button>
+      <button class="preset-btn" data-val="calm & informative">📢 Informative</button>
+      <button class="preset-btn" data-val="sarcastic & funny">😂 Sarcastic</button>
+      <button class="preset-btn" data-val="community alert">🚨 Alert</button>
+    </div>
+
+    <label>Extra Context (optional)</label>
+    <textarea id="context" placeholder="e.g. DMed me pretending to be eFootball support, tried to get my account info..."></textarea>
+  </div>
+
+  <!-- RIGHT: Hashtags & Options -->
+  <div class="panel">
+    <h2>#️⃣ Hashtags</h2>
+
+    <label>Click to toggle hashtags</label>
+    <div class="tag-grid" id="hashtagGrid">
+      <span class="tag selected">#eFootball</span>
+      <span class="tag selected">#eFootballExposed</span>
+      <span class="tag selected">#ScamAlert</span>
+      <span class="tag selected">#eFootball2025</span>
+      <span class="tag">#BewareOf</span>
+      <span class="tag">#eFootballCommunity</span>
+      <span class="tag selected">#Exposed</span>
+      <span class="tag">#FakeAccount</span>
+      <span class="tag">#eFootballHacker</span>
+      <span class="tag">#ToxicPlayer</span>
+      <span class="tag selected">#WatchOut</span>
+      <span class="tag">#eFootballScam</span>
+      <span class="tag">#GamerAlert</span>
+      <span class="tag">#eFootballMobile</span>
+      <span class="tag">#CommunityWarning</span>
+    </div>
+
+    <hr class="divider">
+
+    <h2>⚙️ Caption Options</h2>
+
+    <label>Opener Style</label>
+    <select id="opener">
+      <option value="warning">⚠️ Warning opener</option>
+      <option value="callout">📣 Direct callout</option>
+      <option value="story">📖 Story opener</option>
+      <option value="question">❓ Question hook</option>
+    </select>
+
+    <label>Include CTA</label>
+    <select id="cta">
+      <option value="share">Share to warn others</option>
+      <option value="follow">Follow for more exposés</option>
+      <option value="comment">Drop their name in comments</option>
+      <option value="report">Report & block them</option>
+      <option value="none">No CTA</option>
+    </select>
+
+    <button class="generate-btn" onclick="generateCaption()">⚡ GENERATE CAPTION</button>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="panel full-width">
+    <h2>📋 Your Caption</h2>
+    <div class="output-box" id="output">
+      <span class="output-placeholder">Your generated caption will appear here...</span>
+    </div>
+    <div class="char-count" id="charCount"></div>
+    <button class="copy-btn" id="copyBtn" onclick="copyCaption()" style="display:none">Copy Caption</button>
+  </div>
+
+</div>
+
+<script>
+// Preset button toggle logic
+document.querySelectorAll('#offensePresets .preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#offensePresets .preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('offense').value = btn.dataset.val;
+  });
+});
+
+document.querySelectorAll('#tonePresets .preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tonePresets .preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.tag').forEach(tag => {
+  tag.addEventListener('click', () => tag.classList.toggle('selected'));
+});
+
+function getSelectedTone() {
+  const active = document.querySelector('#tonePresets .preset-btn.active');
+  return active ? active.dataset.val : 'aggressive warning';
+}
+
+function getSelectedHashtags() {
+  return Array.from(document.querySelectorAll('.tag.selected')).map(t => t.textContent).join(' ');
+}
+
+async function generateCaption() {
+  const username = document.getElementById('username').value.trim() || 'this account';
+  const offense = document.getElementById('offense').value.trim() || 'suspicious behavior';
+  const tone = getSelectedTone();
+  const context = document.getElementById('context').value.trim();
+  const opener = document.getElementById('opener').value;
+  const cta = document.getElementById('cta').value;
+  const hashtags = getSelectedHashtags();
+
+  const openerMap = {
+    warning: 'Start with a bold warning line',
+    callout: 'Start with a direct callout of the account',
+    story: 'Start with a short story hook about what happened',
+    question: 'Start with a rhetorical question to hook viewers'
+  };
+
+  const ctaMap = {
+    share: 'End with a CTA urging people to share this to warn others.',
+    follow: 'End with a CTA to follow the account for more exposés.',
+    comment: 'End with a CTA asking people to drop similar usernames in the comments.',
+    report: 'End with a CTA telling people to report and block them.',
+    none: ''
+  };
+
+  const outputEl = document.getElementById('output');
+  outputEl.innerHTML = '<span class="loading">Generating your caption...</span>';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('charCount').textContent = '';
+
+  const prompt = `You write punchy, engaging Instagram/TikTok reel captions for an eFootball community exposure account that warns people about malicious, scam, or toxic accounts in the eFootball mobile game community.
+
+Write a caption for a reel exposing:
+- Account/username: ${username}
+- Offense: ${offense}
+- Tone: ${tone}
+- Opener style: ${openerMap[opener]}
+${context ? `- Context/story: ${context}` : ''}
+${ctaMap[cta] ? `- CTA instruction: ${ctaMap[cta]}` : ''}
+
+Rules:
+- 3–6 short punchy lines max
+- Use line breaks between each thought
+- Use relevant emojis (⚠️ 🚨 🔥 👀 etc.)
+- Sound authentic, like a real eFootball content creator
+- Do NOT include hashtags (they'll be added separately)
+- Keep it under 220 characters if possible, but quality > length
+- Make it feel urgent and community-protective
+
+Return only the caption text, nothing else.`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const caption = data.content.map(i => i.text || '').join('\n').trim();
+    const full = caption + '\n\n' + hashtags;
+
+    outputEl.textContent = full;
+    document.getElementById('charCount').textContent = `${full.length} characters`;
+    document.getElementById('copyBtn').style.display = 'inline-block';
+  } catch (err) {
+    outputEl.innerHTML = '<span style="color:#ff5533">Error generating caption. Please try again.</span>';
+  }
+}
+
+function copyCaption() {
+  const text = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Caption';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
